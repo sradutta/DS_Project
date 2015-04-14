@@ -1,0 +1,28 @@
+import twitter
+CONSUMER_KEY = 'MExajNuZUYOj61FKHxGqhM50P'
+CONSUMER_SECRET = 'l03vdCZQ8cC98OIOPNdJt22vX7bEVQLH2YChneFiiQg6mG1yrO'
+OAUTH_TOKEN = '2575701463-qznBt6icVJuxOLseAkH22ko66IZOrO3KbDihO9T'
+OAUTH_TOKEN_SECRET = 'A4nV7KCst5dXaHuP4KZGhQSmYdvxOfqkznwTyTc5Y4QJC'
+
+#auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_SECRET)
+api = twitter.Api(access_token_key=OAUTH_TOKEN, access_token_secret=OAUTH_TOKEN_SECRET, 
+                  consumer_key=CONSUMER_KEY, consumer_secret=CONSUMER_SECRET)
+#twitter_api = twitter.Twitter(auth=auth)
+
+print (api.VerifyCredentials())
+
+#status = api.PostUpdate('I am learning python-twitter')
+#print(status.text)
+
+WORLD_WOE_ID = 1
+US_WOE_ID = 23424977
+
+world_trends = twitter.Api.trends.place(_id=WORLD_WOE_ID)
+us_trends = twitter.Api.trends.place(_id=US_WOE_ID)
+
+print(world_trends)
+print
+print(us_trends)
+
+
+

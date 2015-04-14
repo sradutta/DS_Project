@@ -1,0 +1,28 @@
+
+import tweepy
+import csv
+import time
+
+CONSUMER_KEY = 'MExajNuZUYOj61FKHxGqhM50P'
+CONSUMER_SECRET = 'l03vdCZQ8cC98OIOPNdJt22vX7bEVQLH2YChneFiiQg6mG1yrO'
+OAUTH_TOKEN = '2575701463-qznBt6icVJuxOLseAkH22ko66IZOrO3KbDihO9T'
+OAUTH_TOKEN_SECRET = 'A4nV7KCst5dXaHuP4KZGhQSmYdvxOfqkznwTyTc5Y4QJC'
+
+auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+auth.set_access_token(OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
+api = tweepy.API(auth)
+csvFile = open('resultsports.csv', 'a')
+csvWriter = csv.writer(csvFile)
+
+c = tweepy.Cursor(api.search, q="sports", since="2015-04-05", until="2015-04-10",  include_entities=True).items()
+
+while True:
+    try:
+        tweet = c.next()
+        csvWriter.writerow([tweet.user.screen_name,tweet.geo,tweet.source,tweet.created_at,tweet.text.encode('utf-8'), tweet.retweet_count])
+    except tweepy.TweepError:
+        time.sleep(60 * 15)
+        continue
+    except UnicodeEncodeError:
+        pass
+

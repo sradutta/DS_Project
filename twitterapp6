@@ -1,0 +1,50 @@
+import io
+import simplejson as json
+import twitter
+
+CONSUMER_KEY = 'MExajNuZUYOj61FKHxGqhM50P'
+CONSUMER_SECRET = 'l03vdCZQ8cC98OIOPNdJt22vX7bEVQLH2YChneFiiQg6mG1yrO'
+OAUTH_TOKEN = '2575701463-qznBt6icVJuxOLseAkH22ko66IZOrO3KbDihO9T'
+OAUTH_TOKEN_SECRET = 'A4nV7KCst5dXaHuP4KZGhQSmYdvxOfqkznwTyTc5Y4QJC'
+
+# Authenticate with OAuth    
+auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET,
+                               CONSUMER_KEY, CONSUMER_SECRET)
+    
+# Create a connection to the Twitter Streaming API
+twitter_stream = twitter.TwitterStream(auth=auth)
+
+QUERY = 'climate'
+OUT_FILE = 'tweets_'+QUERY+'.json'
+
+print ('Filtering the public timeline for "{0}"'.format(QUERY))
+ 
+#stream = twitter_stream.statuses.filter(track=QUERY)
+stream = twitter_stream.statuses.filter(track=QUERY,language='English',locations='-74,40,-73,41', filter_level='medium') 
+
+# Write one tweet per line as a JSON document. 
+with io.open(OUT_FILE, 'a', encoding='utf-8',buffering=1) as f:
+    for tweet in stream:
+        f.write(str(u'{0}\n'.format(json.dumps(tweet, ensure_ascii=False))))
+        print (tweet['text'])
+
+
+import pandas as pd
+ 
+DATA_FILES = ['tweets_climate.json', 'tweets_environment.json', 'tweets_weather.json', 'tweets_globalwarming.json']
+data_frames = dict()
+ 
+for data_file in DATA_FILES:
+    data = "[{0}]".format(",".join([line for line in open(data_file).readlines()]))
+    data_frames[data_file.split('_')[1].split('.')[0]] = pd.read_json(data, orient='records')
+    
+# All the values should be of data frame type
+print ({k:type(v) for k,v in data_frames.items()})
+ 
+# to see an individual sample data frame
+print (data_frames['climate'])
+
+
+
+
+

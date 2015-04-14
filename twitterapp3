@@ -1,0 +1,56 @@
+import twitter
+def oauth_login():
+    CONSUMER_KEY = 'MExajNuZUYOj61FKHxGqhM50P'
+    CONSUMER_SECRET = 'l03vdCZQ8cC98OIOPNdJt22vX7bEVQLH2YChneFiiQg6mG1yrO'
+    OAUTH_TOKEN = '2575701463-qznBt6icVJuxOLseAkH22ko66IZOrO3KbDihO9T'
+    OAUTH_TOKEN_SECRET = 'A4nV7KCst5dXaHuP4KZGhQSmYdvxOfqkznwTyTc5Y4QJC'
+    auth = twitter.oauth.OAuth(OAUTH_TOKEN, OAUTH_TOKEN_SECRET, CONSUMER_KEY, CONSUMER_SECRET)
+    twitter_api = twitter.Twitter(auth=auth)
+    return twitter_api
+    
+twitter_api = oauth_login()
+print(twitter_api)
+
+#collecting trends
+import json
+def twitter_trends(twitter_api,woe_id):
+    return twitter_api.trends.place(_id=woe_id)
+
+US_WOE_ID = 23424977
+us_trends = twitter_trends(twitter_api, US_WOE_ID)
+print(json.dumps(us_trends,indent=1))
+
+WORLD_WOE_ID = 1
+world_trends = twitter_trends(twitter_api, WORLD_WOE_ID)
+print(json.dumps(world_trends,indent=1))
+#collecting trends
+
+for location in world_trends:
+	for trend in location["trends"]:
+		print (" - %s" % trend["name"])    
+
+
+
+#searching for tweets
+def twitter_search(twitter_api,q,max_results=200, **kw):
+    search_results = twitter_api.search.tweets(q=q, count=100, **kw)
+    statuses = search_results['statuses']
+    max_results = min(1000, max_results)
+    for _ in range(10):
+        try:
+            next_results = search_results['search_metadata']['next_results']
+        except KeyError as e:
+            break
+        kwargs = dict([kv.split('=') for kv in next_results[1:].split("&")])
+        search_results = twitter_api.search.tweets(**kwargs)
+        statuses += search_results['statuses']
+        
+        if len(statuses) > max_results:
+            break
+    return statuses
+    
+q = "Climate"
+results = twitter_search(twitter_api, q, max_results=10)
+print(json.dumps(results[0],indent=1))
+#searching for tweets
+
